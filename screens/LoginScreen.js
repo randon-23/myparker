@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useAuthService } from '../auth/AuthService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ const LoginScreen = ({ navigation }) => {
     textColor: '#000',
     backgroundColor: '#000',
   });
+  const { login } = useAuthService();
 
   const updateTheme = (type) => {
     if (type === 'business') {
@@ -31,7 +33,47 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  console.log('Login Component rendered')
+  const handleLogin = async () => {
+    if(!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    const formData = {
+      userType,
+      email,
+      password
+    }
+
+    try{
+      const response = await login(formData.email, formData.password, formData.userType);
+
+      if(!response.success){
+        console.log(response)
+        
+        if(response.error.includes('User type mismatch or user not found')){
+          Alert.alert('Login error', response.error)
+        } else if(response.error.includes('Invalid email or password')) {
+          Alert.alert('Login error', response.error)
+        } else {
+          Alert.alert('Login error', `An error occurred - ${error.message}`)
+        }
+      } else {
+        //Navigate to the appropriate landing screen
+        // if(formData.userType === 'business'){
+        //   navigation.navigate('BusinessLanding')
+        // } else {
+        //   navigation.navigate('CustomerLanding')
+        // }
+        console.log('Login successful')
+        console.log(response.session)
+      }
+
+    } catch(error){
+      console.error('Login error:', error.message);
+      Alert.alert('Login error', error.message)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -68,7 +110,6 @@ const LoginScreen = ({ navigation }) => {
         <View style={styles.segmentedControl}>
           <TouchableOpacity
             onPress={() => {
-              console.log('Customer button pressed')
               setUserType('customer');
               updateTheme('customer');
             }}
@@ -84,7 +125,6 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              console.log('Business button pressed')
               setUserType('business')
               updateTheme('business');
             }}
@@ -101,7 +141,10 @@ const LoginScreen = ({ navigation }) => {
         </View>
 
         {/* Login Button */}
-        <TouchableOpacity style={[styles.button, { backgroundColor: theme.primaryColor }]}>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: theme.primaryColor }]}
+          onPress={handleLogin}
+        >
           <Text style={[styles.buttonText, { color: theme.textColor }]}>Log-in</Text>
         </TouchableOpacity>
 

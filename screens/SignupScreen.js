@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import AuthService from '../auth/AuthService';
+import { useAuthService } from '../auth/AuthService';
 
 const SignupScreen = ({ navigation }) => {
     //This is a user type that will determine the state of the login screen
@@ -22,6 +22,7 @@ const SignupScreen = ({ navigation }) => {
         textColor: '#000',
         backgroundColor: '#000',
     });
+    const { signup } = useAuthService();
 
     const updateTheme = (type) => {
         if (type === 'business') {
@@ -97,7 +98,7 @@ const SignupScreen = ({ navigation }) => {
     
         try {
             // Attempt to sign up the user
-            const response = await AuthService.signup(formData);
+            const response = await signup(formData);
     
             if (response.success) {
                 Alert.alert(

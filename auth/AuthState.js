@@ -3,58 +3,69 @@ import { supabase } from '../lib/supabase.js'
 
 const AuthContext = createContext()
 
-const AuthProvider = ({ children }) => {
-    const [session, setSession] = useState(null)
-    const [userData, setUserData] = useState(null)
+export const useAuth = () => { return useContext(AuthContext) }
 
-    const fetchUserData = async (userId) => {
-        const { data, error } = await supabase
-          .from('users_plus')
-          .select('*') // or just the fields you need
-          .eq('id', userId)
-          .single();
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      const checkSession = async () => {
+        setLoading(true);
+        const { data } = await supabase.auth.getSession();
   
-        if (error) {
-          console.error('Error fetching user data:', error);
-          return null;
+        if (data.session) {
+          setUser(data.session.user);
+          // Fetch user type or other user-related data
+          supabase
+            .from('users')
+            .select('*')
+            .eq('id', data.session.user.id)
+            .single()
+            .then(({ data }) => {
+              setUserData(data);
+              console.log('User data keys and values:');
+              Object.entries(data).forEach(([key, value]) => {
+                console.log(`${key}: ${value}`);
+              });
+            });
         }
   
-        return data;
+        setLoading(false);
       };
   
-      const setAuthState = async (session) => {
-        setSession(session);
-        if (session?.user?.id) {
-          const data = await fetchUserData(session.user.id);
-          setUserData(data);
+      checkSession();
+  
+      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log('onAuthStateChange event triggered:', event, session);
+        if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION' && session){
+          setUser(session.user)
+          supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+            .then(({ data }) => {
+              setUserData(data);
+            });
+        } else if (event === 'SIGNED_OUT' || !session) {
+          setUser(null);
+          setUserData(null);
         }
-    };
-    
-    useEffect(() => {
-        // Get current session and set state
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setAuthState(session);
-        });
-    
-        // Listen for changes in authentication state
-        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-            setAuthState(session);
-        });
-
-        return () => {
-            authListener?.unsubscribe();
-        };
-    }, [])
+      });
+  
+      return () => {
+          console.log('Cleaning up onAuthStateChange event listener');
+          authListener.subscription.unsubscribe();
+      };
+    }, []);
 
     return (
-        <AuthContext.Provider value={{ session, userData }}>
-          {children}
-        </AuthContext.Provider>
+      <AuthContext.Provider value={{ user, userData, loading, setLoading }}>
+        {children}
+      </AuthContext.Provider>
     );
-}
-
-export const useAuth = () => {
-    return useContext(AuthContext);
 }
 
 export default AuthProvider;

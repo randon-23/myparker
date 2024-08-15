@@ -3,22 +3,34 @@ import AuthStack from './authStack';
 import BusinessStack from './businessStack';
 import CustomerStack from './customerStack';
 import { useAuth } from '../auth/AuthState.js';
+import { LoadingScreen } from '../screens/screens.js';
 
 
 const MainNavigator = () => {
-    const { session, userData } = useAuth();
+    const { user, userData, loading } = useAuth();
 
-    if (!session || !userData) {
+    if (loading) {
+        // Show a loading screen while checking authentication state
+        return <LoadingScreen />;    
+    }
+
+    if (!user) {
         // Show authentication screens if not logged in or userType is not fetched yet
         return <AuthStack />;
     }
 
-    // if (!userData) {
-    //     // You could show a loading spinner or placeholder while fetching user data
-    //     return <LoadingScreen />;
-    // }
-    
-    return userData.usertype === 'business' ? <BusinessStack /> : <CustomerStack />;
+    if (userData && userData.usertype === 'business') {
+        // Show business screens if user is a business
+        return <BusinessStack />;
+    }
+
+    // Show customer screens if user is a customer
+    if(userData && userData.usertype === 'customer') {
+        return <CustomerStack />;
+    }
+
+    // Show authentication screens if userType is not fetched yet
+    return <AuthStack />;
 }
 
 export default MainNavigator;
