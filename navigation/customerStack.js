@@ -1,14 +1,16 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { CustomerLandingScreen, SettingsScreen } from "../screens/screens.js";
+import { CustomerLandingScreen, SettingsScreen } from "../components/screens/screens.js";
 import { TouchableOpacity, Image, StatusBar } from "react-native";
 import { Icon } from 'react-native-elements';
 import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext.js";
 
 const Stack = createStackNavigator();
 
-const CustomerStack = ({ navigation }) => {
-    
+const CustomerStack = () => {
+    const { theme } = useTheme();
+    const navigation = useNavigation();
     return (
         <>
             <StatusBar barStyle="light-content" />
@@ -27,7 +29,7 @@ const CustomerStack = ({ navigation }) => {
                         ),
                         headerLeft: () => (
                             <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-                                <Icon name="menu" size={30} color="#FFD700" style={{ marginLeft: 15 }} />
+                                <Icon name="menu" size={30} color={theme.primaryColor} style={{ marginLeft: 15 }} />
                             </TouchableOpacity>
                         ),
                         headerStyle: { backgroundColor: '#000' },

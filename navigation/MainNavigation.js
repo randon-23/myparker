@@ -2,8 +2,8 @@ import React from 'react';
 import AuthStack from './authStack';
 import BusinessStack from './businessStack';
 import CustomerStack from './customerStack';
-import { useAuth } from '../auth/AuthState.js';
-import { LoadingScreen } from '../screens/screens.js';
+import { useAuth } from '../contexts/AuthContext.js';
+import { LoadingScreen } from '../components/screens/screens.js';
 
 
 const MainNavigator = () => {
@@ -21,12 +21,12 @@ const MainNavigator = () => {
 
     if (userData && userData.usertype === 'business') {
         // Show business screens if user is a business
-        return <BusinessStack userType={userData.usertype} />;
+        return <BusinessStack />;
     }
 
     // Show customer screens if user is a customer
     if(userData && userData.usertype === 'customer') {
-        return <CustomerStack userType={userData.usertype} />;
+        return <CustomerStack />;
     }
 
     // Show authentication screens if userType is not fetched yet

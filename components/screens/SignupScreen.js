@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useAuthService } from '../auth/AuthService';
+import { useAuthService } from '../../services/AuthService';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const SignupScreen = ({ navigation }) => {
     //This is a user type that will determine the state of the login screen
@@ -17,28 +18,8 @@ const SignupScreen = ({ navigation }) => {
     const [customerLicensePlate, setCustomerLicensePlate] = useState('');
     const [businessName, setBusinessName] = useState('');
 
-    const [theme, setTheme] = useState({
-        primaryColor: '#FFD700',
-        textColor: '#000',
-        backgroundColor: '#000',
-    });
+    const { theme, updateTheme } = useTheme();
     const { signup } = useAuthService();
-
-    const updateTheme = (type) => {
-        if (type === 'business') {
-          setTheme({
-            primaryColor: '#40E0D0',
-            textColor: '#000',
-            backgroundColor: '#000',
-          });
-        } else {
-          setTheme({
-            primaryColor: '#FFD700',
-            textColor: '#000',
-            backgroundColor: '#000',
-          });
-        }
-    };
 
     // Function to reset all fields upon changing user type
     const resetFields = () => {
@@ -128,7 +109,7 @@ const SignupScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.backgroundColor}]}>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Choose Account type and fill in fields</Text>
 
@@ -347,7 +328,6 @@ export default SignupScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         padding: 20,
         justifyContent: 'center',
     },

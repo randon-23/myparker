@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useAuth } from '../auth/AuthState.js';
+import { useAuth } from '../../contexts/AuthContext.js';
+import { useTheme } from "../../contexts/ThemeContext.js";
 import { Button } from 'react-native-elements';
-import { useAuthService } from '../auth/AuthService.js';
+import { useAuthService } from '../../services/AuthService.js';
 
 const BusinessLandingScreen = () => {
     const { userData } = useAuth();
+    const { theme } = useTheme();
 
     return (
         <View styles={styles.container}>

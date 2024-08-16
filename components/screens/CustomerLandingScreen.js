@@ -1,32 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useAuth } from '../auth/AuthState.js';
+import { useAuth } from '../../contexts/AuthContext.js';
+import { useTheme } from "../../contexts/ThemeContext.js";
 import { Button, Icon } from 'react-native-elements';
 
 const CustomerLandingScreen = () => {
     const { userData } = useAuth();
+    const { theme } = useTheme();
     
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Welcome {userData.contact_name}!</Text>
             <Text style={styles.subtitle}>Before scanning, make sure to come to a <Text style={{color: 'red'}}>complete stop!</Text></Text>
 
-            <Button
-                title="Scan Car Park QR Code"
-                buttonStyle={styles.button}
-                titleStyle={styles.buttonTitle}
-                icon={
-                    <Icon
-                        name="qrcode"
-                        type='font-awesome'
-                        size={24}
-                        color={'#000'}
-                        style={{ marginRight: 10 }}
-                    >
-                    </Icon>
-                }
+            <TouchableOpacity
+                style={[styles.button, { backgroundColor: theme.primaryColor }]}
                 >
-            </Button>
+                <Icon
+                    name="qrcode"
+                    type='font-awesome'
+                    size={24}
+                    color={'#000'}
+                    style={{ marginRight: 10 }}
+                >
+                </Icon>
+                <Text style={[styles.buttonText, { color: theme.backgroundColor }]}>Scan Car Park QR Code</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -55,12 +54,14 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     button: {
-        backgroundColor: '#FFD700',
+        flexDirection: 'row',
         paddingVertical: 15,
         borderRadius: 5,
         marginTop: 20,
+        justifyContent: 'center',
     },
-    buttonTitle: {
-        color: '#000',
-    },
+    buttonText: {
+        fontSize: 18,
+        textAlign: 'center',
+    }
 });

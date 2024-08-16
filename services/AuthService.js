@@ -1,5 +1,5 @@
 import { supabase, supabaseAdmin } from '../lib/supabase.js';
-import { useAuth } from './AuthState.js';
+import { useAuth } from '../contexts/AuthContext.js';
 
 export const useAuthService = () => {
     const { setLoading } = useAuth();
