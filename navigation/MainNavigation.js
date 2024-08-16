@@ -21,12 +21,12 @@ const MainNavigator = () => {
 
     if (userData && userData.usertype === 'business') {
         // Show business screens if user is a business
-        return <BusinessStack />;
+        return <BusinessStack userType={userData.usertype} />;
     }
 
     // Show customer screens if user is a customer
     if(userData && userData.usertype === 'customer') {
-        return <CustomerStack />;
+        return <CustomerStack userType={userData.usertype} />;
     }
 
     // Show authentication screens if userType is not fetched yet

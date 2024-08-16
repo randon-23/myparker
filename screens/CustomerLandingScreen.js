@@ -1,37 +1,66 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useAuth } from '../auth/AuthState.js';
-import { Button } from 'react-native-elements';
-import { useAuthService } from '../auth/AuthService.js';
+import { Button, Icon } from 'react-native-elements';
 
-const CustomerLandingScreen = ({ navigation }) => {
-    const { user, userData } = useAuth();
-    const { logout } = useAuthService();
+const CustomerLandingScreen = () => {
+    const { userData } = useAuth();
     
-    const handleLogout = async () => {
-        try {
-            const response = await logout();
-            if(response.success){
-                console.log('Logged out');
-            } else {
-                console.log('Error logging out');
-                Alert.alert(`Error logging out: ${response.error}`);
-            }
-        } catch (error) {
-            console.log('Error logging out');
-        }
-    }
     return (
-        <View>
-            <Text>CustomerLandingScreen</Text>
-            <Text>{user.email} - {userData.contact_name} - {userData.usertype}</Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>Welcome {userData.contact_name}!</Text>
+            <Text style={styles.subtitle}>Before scanning, make sure to come to a <Text style={{color: 'red'}}>complete stop!</Text></Text>
+
             <Button
-                title="Logout"
-                onPress={handleLogout}
+                title="Scan Car Park QR Code"
+                buttonStyle={styles.button}
+                titleStyle={styles.buttonTitle}
+                icon={
+                    <Icon
+                        name="qrcode"
+                        type='font-awesome'
+                        size={24}
+                        color={'#000'}
+                        style={{ marginRight: 10 }}
                     >
+                    </Icon>
+                }
+                >
             </Button>
         </View>
     );
 }
 
 export default CustomerLandingScreen;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#000',
+        padding: 20,
+        justifyContent: 'center',
+    },
+    title: {
+        color: '#FFF',
+        fontSize: 32,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    subtitle: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#FFD700',
+        paddingVertical: 15,
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    buttonTitle: {
+        color: '#000',
+    },
+});

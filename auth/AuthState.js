@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
       checkSession();
   
       const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        setLoading(true);
         console.log('onAuthStateChange event triggered:', event, session);
         if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION' && session){
           setUser(session.user)
@@ -53,6 +54,7 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
           setUserData(null);
         }
+        setLoading(false);
       });
   
       return () => {

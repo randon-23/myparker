@@ -51,7 +51,7 @@ const LoginScreen = ({ navigation }) => {
       if(!response.success){
         console.log(response)
         
-        if(response.error.includes('User type mismatch or user not found')){
+        if(response.error.includes('Account is not of selected type.')){
           Alert.alert('Login error', response.error)
         } else if(response.error.includes('Invalid email or password')) {
           Alert.alert('Login error', response.error)
@@ -59,12 +59,6 @@ const LoginScreen = ({ navigation }) => {
           Alert.alert('Login error', `An error occurred - ${error.message}`)
         }
       } else {
-        //Navigate to the appropriate landing screen
-        // if(formData.userType === 'business'){
-        //   navigation.navigate('BusinessLanding')
-        // } else {
-        //   navigation.navigate('CustomerLanding')
-        // }
         console.log('Login successful')
         console.log(response.session)
       }
