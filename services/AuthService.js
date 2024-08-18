@@ -1,8 +1,10 @@
 import { supabase, supabaseAdmin } from '../lib/supabase.js';
 import { useAuth } from '../contexts/AuthContext.js';
+import { useTheme } from '../contexts/ThemeContext.js';
 
 export const useAuthService = () => {
     const { setLoading } = useAuth();
+    const { updateTheme } = useTheme();
 
     const login = async (email, password, userType) => {
         setLoading(true);
@@ -15,11 +17,12 @@ export const useAuthService = () => {
                 .eq('usertype', userType)
                 .single();
     
-            if (userError) throw new Error('User type mismatch or user not found');
+            if (userError) throw new Error('Account is not of selected type');
             
             const { data: { session }, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw new Error('Invalid email or password');
-    
+            
+            updateTheme(userType) //Set theme based on user type
             return { success: true, session };
         } catch (error) {
             return { success: false, error: error.message };
@@ -33,7 +36,8 @@ export const useAuthService = () => {
         try{
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-    
+            
+            updateTheme('customer') //When navigating back to home screen always reset theme
             return { success: true };
         } catch(error){
             console.error('Logout error:', error.message);

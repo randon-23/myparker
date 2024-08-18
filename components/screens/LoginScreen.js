@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuthService } from '../../services/AuthService';
@@ -10,7 +10,7 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   //This is a user type that will determine the state of the login screen
-  const [userType, setUserType] = useState('customer');
+  const [userType, setUserType] = useState('customer'); //Local usertype mainly for setting of theme
 
   const { theme, updateTheme } = useTheme();
   const { login } = useAuthService();
@@ -33,7 +33,7 @@ const LoginScreen = ({ navigation }) => {
       if(!response.success){
         console.log(response)
         
-        if(response.error.includes('Account is not of selected type.')){
+        if(response.error.includes('Account is not of selected type')){
           Alert.alert('Login error', response.error)
         } else if(response.error.includes('Invalid email or password')) {
           Alert.alert('Login error', response.error)

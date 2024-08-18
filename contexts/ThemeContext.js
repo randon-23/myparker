@@ -1,16 +1,14 @@
 import React, { createContext, useContext, useState } from 'react';
 
-const defaultTheme = {
-    primaryColor: '#FFD700',
-    textColor: '#000',
-    backgroundColor: '#000',
-};
-
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const [theme, setTheme] = useState(defaultTheme);
-
+    const [theme, setTheme] = useState({
+        primaryColor: '#FFD700',
+        textColor: '#000',
+        backgroundColor: '#000'
+    });
+    
     const updateTheme = (type) => {
         if (type === 'business') {
             setTheme({
@@ -19,7 +17,11 @@ export const ThemeProvider = ({ children }) => {
                 backgroundColor: '#000',
             });
         } else {
-            setTheme(defaultTheme);
+            setTheme({
+                primaryColor: '#FFD700',
+                textColor: '#000',
+                backgroundColor: '#000'
+            });
         }
     };
 

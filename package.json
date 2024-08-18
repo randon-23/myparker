@@ -16,14 +16,19 @@
     "@supabase/supabase-js": "^2.45.1",
     "expo": "^51.0.26",
     "expo-constants": "~16.0.2",
+    "expo-file-system": "~17.0.1",
+    "expo-media-library": "~16.0.4",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-dotenv": "^3.4.11",
-    "react-native-elements": "^3.4.3"
+    "react-native-elements": "^3.4.3",
+    "react-native-qrcode-svg": "^6.3.2",
+    "react-native-svg": "^15.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "expo-module-scripts": "^3.5.2",
     "metro-react-native-babel-preset": "^0.77.0"
   },
   "private": true

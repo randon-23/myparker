@@ -1,13 +1,20 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import AuthStack from './authStack';
 import BusinessStack from './businessStack';
 import CustomerStack from './customerStack';
 import { useAuth } from '../contexts/AuthContext.js';
+import { useTheme } from '../contexts/ThemeContext.js';
 import { LoadingScreen } from '../components/screens/screens.js';
-
 
 const MainNavigator = () => {
     const { user, userData, loading } = useAuth();
+    const { updateTheme } = useTheme();
+
+    useEffect(() => {
+        if (!loading && userData) {
+            updateTheme(userData.usertype);
+        }
+    }, [loading, userData]);
 
     if (loading) {
         // Show a loading screen while checking authentication state
