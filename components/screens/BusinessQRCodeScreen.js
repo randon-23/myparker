@@ -3,9 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { useTheme } from "../../contexts/ThemeContext.js";
 import { Icon } from 'react-native-elements';
-import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
-import { generateQRCode, fetchQRCode, downloadQRCode } from '../../services/QRCodeService.js';
+import { generateQRCode, fetchQRCode, downloadQRCode, shareQRCode } from '../../services/QRCodeService.js';
 import QRCODE from '../elements/qrcode.js';
 
 const BusinessQRCodeScreen = () => {
@@ -79,6 +78,10 @@ const BusinessQRCodeScreen = () => {
         }
     }
 
+    const handleShareQRCode = async () => {
+        await shareQRCode(qrCodeRef, userData.business_name);
+    }
+
     return (
         <View style={styles.container}>
             {qrCode ? (
@@ -93,7 +96,7 @@ const BusinessQRCodeScreen = () => {
                     />
                     <TouchableOpacity
                         style={[styles.button, { backgroundColor: theme.primaryColor }]}
-                        //onPress={handleShareQRCode}  // Assuming this is the handler for download/share
+                        onPress={handleShareQRCode}
                     >
                         <Icon
                             name="share-alt"

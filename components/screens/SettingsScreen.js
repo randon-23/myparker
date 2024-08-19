@@ -7,7 +7,6 @@ import { useAuthService } from '../../services/AuthService.js';
 const SettingsScreen = ({ navigation }) => {
     const { user, userData } = useAuth()
     const { logout } = useAuthService()
-    console.log(userData)
 
     const handleLogout = async () => {
         try {
@@ -58,19 +57,35 @@ const SettingsScreen = ({ navigation }) => {
 
                 {/* Menu Options Section */}
                 <View style={styles.menuOptionsContainer}>
-                    <TouchableOpacity
-                        style={styles.optionButton}
-                        onPress={() => navigation.navigate('BusinessQRCode')}
-                    >
-                        <Icon
-                            name="qrcode"
-                            type="font-awesome"
-                            size={24}
-                            color={'#FFF'}
-                            style={styles.optionIcon}
-                        />
-                        <Text style={styles.optionText}>Your Business QR Code</Text>
-                    </TouchableOpacity>
+                    {userData.usertype === 'business' ? (
+                        <TouchableOpacity
+                            style={styles.optionButton}
+                            onPress={() => navigation.navigate('BusinessQRCode')}
+                        >
+                            <Icon
+                                name="qrcode"
+                                type="font-awesome"
+                                size={24}
+                                color={'#FFF'}
+                                style={styles.optionIcon}
+                            />
+                            <Text style={styles.optionText}>Your Business QR Code</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            style={styles.optionButton}
+                            //onPress={() => navigation.navigate('ParkingQRCode')}
+                        >
+                            <Icon
+                                name="qrcode"
+                                type="font-awesome"
+                                size={24}
+                                color={'#FFF'}
+                                style={styles.optionIcon}
+                            />
+                            <Text style={styles.optionText}>Your Active Parking QR Code</Text>
+                        </TouchableOpacity>
+                    )}
 
                     <TouchableOpacity
                         style={styles.optionButton}

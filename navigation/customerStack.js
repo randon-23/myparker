@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { CustomerLandingScreen, SettingsScreen } from "../components/screens/screens.js";
+import { CustomerLandingScreen, SettingsScreen, QRCodeScannerScreen } from "../components/screens/screens.js";
 import { TouchableOpacity, Image, StatusBar } from "react-native";
 import { Icon } from 'react-native-elements';
 import { useNavigation } from "@react-navigation/native";
@@ -41,6 +41,10 @@ const CustomerStack = () => {
                     name="Settings" 
                     component={SettingsScreen}
                     options={{ headerShown: true, title: 'Settings', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center'}}
+                />
+                <Stack.Screen 
+                    name="QRCodeScanner"
+                    component={QRCodeScannerScreen}
                 />
             </Stack.Navigator>
         </>

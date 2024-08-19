@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabase.js'
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { Alert } from 'react-native';
-
+import { Share } from 'react-native';
 //This is not wrapped in a function like AuthService because it is does not need to influence global state or
 
 // Function to fetch an existing QR code for a business from the database
@@ -60,7 +60,6 @@ export async function downloadQRCode(qrCodeRef, userData) {
     try{
         if (qrCodeRef.current) {
             qrCodeRef.current.toDataURL(async (dataURL) => {
-                const base64Code = `data:image/png;base64,${dataURL}`;
                 const fileName = `${userData.business_name}_qrcode.png`;
     
                 // Create a file path in the Downloads directory
@@ -68,7 +67,7 @@ export async function downloadQRCode(qrCodeRef, userData) {
     
                 try {
                     // Save the file
-                    await FileSystem.writeAsStringAsync(filePath, base64Code, {
+                    await FileSystem.writeAsStringAsync(filePath, dataURL, {
                         encoding: FileSystem.EncodingType.Base64,
                     });
     
@@ -82,9 +81,44 @@ export async function downloadQRCode(qrCodeRef, userData) {
                         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
                     }
     
-                    Alert.alert('Success', `QR Code has been saved to your Images -> QR Codes folder.`);
+                    Alert.alert('Success', `QR Code has been saved to Gallery`);
                 } catch (error) {
                     Alert.alert('Error', 'Failed to download QR code.');
+                }
+            });
+        } else {
+            Alert.alert('Error', 'QR code not found.');
+        }
+    } catch(error){
+        Alert.alert('Error encountered =>', error.message);
+    }
+}
+
+export async function shareQRCode(qrCodeRef, userData) {
+    try{
+        if (qrCodeRef.current) {
+            qrCodeRef.current.toDataURL(async (dataURL) => {
+                try {
+                    const fileName = `${userData.business_name}_qrcode.png`;
+
+                    // Create a temporary file path to store the image
+                    const filePath = `${FileSystem.documentDirectory}${fileName}`;
+    
+                    // Save the file
+                    await FileSystem.writeAsStringAsync(filePath, dataURL, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
+    
+                    // Use the Share API to open the share dialog
+                    await Share.share({
+                        url: filePath,
+                        title: `${userData.business_name} QR Code`,
+                        message: 'Check out this QR code!',
+                    });
+    
+                } catch (error) {
+                    console.error('Error sharing QR code:', error);
+                    Alert.alert('Error', 'Failed to share QR code.');
                 }
             });
         } else {

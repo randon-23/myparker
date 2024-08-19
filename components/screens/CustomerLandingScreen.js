@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext.js';
 import { useTheme } from "../../contexts/ThemeContext.js";
 import { Button, Icon } from 'react-native-elements';
 
-const CustomerLandingScreen = () => {
+const CustomerLandingScreen = ({ navigation }) => {
     const { userData } = useAuth();
     const { theme } = useTheme();
     
@@ -15,6 +15,7 @@ const CustomerLandingScreen = () => {
 
             <TouchableOpacity
                 style={[styles.button, { backgroundColor: theme.primaryColor }]}
+                onPress={() => navigation.navigate('QRCodeScanner')}
                 >
                 <Icon
                     name="qrcode"
