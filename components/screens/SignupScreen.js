@@ -103,7 +103,6 @@ const SignupScreen = ({ navigation }) => {
             }
         } catch (error) {
             // Catch any unexpected errors during the signup process
-            console.error(`Signup failed due to unexpected error: ${error.message}`);
             alert(`Signup failed due to unexpected error: ${error.message}`);
         }
     };

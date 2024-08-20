@@ -6,8 +6,8 @@ const QRCODE = ({ value, getRef }) => {
         <QRCode
             value={value}
             size={250}
-            color="black"
-            backgroundColor="white"
+            color="white"
+            backgroundColor="black"
             getRef={getRef}  // Attach the ref passed down from the parent component
         />
     );

@@ -40,7 +40,6 @@ export const useAuthService = () => {
             updateTheme('customer') //When navigating back to home screen always reset theme
             return { success: true };
         } catch(error){
-            console.error('Logout error:', error.message);
             return { success: false, error: error.message };
         } finally {
             setLoading(false);
@@ -89,14 +88,13 @@ export const useAuthService = () => {
                 // Attempt to clean up by deleting the user from the auth.users table
                 const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
                 if (deleteUserError) {
-                    console.error('Failed to delete user after insertion error:', deleteUserError.message);
+                    console.log('Failed to delete user after insertion error:', deleteUserError.message);
                 }
                 throw userInsertError; // Re-throw to be caught by the outer catch
             }
     
             return { success: true, user };
         } catch (error) {
-            console.error('Signup error:', error.message);
             return { success: false, error: error.message };
         } finally {
             setLoading(false);

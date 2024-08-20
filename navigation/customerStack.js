@@ -45,6 +45,7 @@ const CustomerStack = () => {
                 <Stack.Screen 
                     name="QRCodeScanner"
                     component={QRCodeScannerScreen}
+                    options={{ headerShown: true, title: 'Scan QR Code', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center' }}
                 />
             </Stack.Navigator>
         </>

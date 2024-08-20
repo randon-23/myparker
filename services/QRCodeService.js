@@ -3,6 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { Alert } from 'react-native';
 import { Share } from 'react-native';
+import { v4 as uuidv4 } from 'uuid';
 //This is not wrapped in a function like AuthService because it is does not need to influence global state or
 
 // Function to fetch an existing QR code for a business from the database
@@ -21,8 +22,8 @@ export async function fetchQRCode(businessName) {
         }
 
         return data.qr_code;
-    } catch (err) {
-        console.error('Unexpected error in fetchQRCode:', err);
+    } catch (error) {
+        throw new Error(`Unexpected error in fetchQRCode: ${error.message}`);
     }
 }
 
@@ -38,8 +39,7 @@ export async function generateQRCode(businessName) {
         .single();
 
     if (error) {
-        console.error('Error inserting QR code into database:', error);
-        throw new Error('Failed to generate QR code');
+        throw new Error('Failed to generate business QR code');
     }
 
     // Return the generated QR code string
@@ -52,6 +52,11 @@ function generateUniqueString(businessName) {
     // Create a unique string using the business name and a random alphanumeric string
     const randomString = Math.random().toString(36).substring(2, 15);
     return `${businessName}-${randomString}`;
+}
+
+function generateUniqueParkingString(userId){
+    const randomString = uuidv4(); // UUID with dashes, 36 characters
+    return `${userId}-${randomString}`;
 }
 
 // Function to download the QR code as a image file to device
@@ -117,7 +122,6 @@ export async function shareQRCode(qrCodeRef, userData) {
                     });
     
                 } catch (error) {
-                    console.error('Error sharing QR code:', error);
                     Alert.alert('Error', 'Failed to share QR code.');
                 }
             });
@@ -126,5 +130,71 @@ export async function shareQRCode(qrCodeRef, userData) {
         }
     } catch(error){
         Alert.alert('Error encountered =>', error.message);
+    }
+}
+
+// userData is the user's data from the AuthContext
+// qrCodeValue is the scanned QR code value
+// data in if(data) block is the data from the database
+export async function verifyBusinessQRCode(businessQRCodeValue, userData) {
+    try{
+        // Fetch the business name from the database using the scanned QR code value to verify
+        const { data, error } = await supabase
+            .from('business_qr_codes')
+            .select('business_name')
+            .eq('qr_code', businessQRCodeValue)
+            .single();
+
+        if(error) {
+            throw new Error('An error occurred while verifying the QR Code data');
+        }
+
+        if(data) {
+            // Generate parking QR Code
+            const result = await generateParkingQRCode(data.business_name, userData);
+
+            if(!result.success) {
+                // If generation of parking QR code erroneous, return error message from source to be handled in client side handler and displayed in alert
+                return result
+            }
+
+            // Return success message to be handled in client side handler and displayed in alert
+            return { success: true, message: `QR Code verified Welcome to ${data.business_name} car park!` }
+        } else {
+            return { success: false, message: 'QR Code not found' }
+        }
+    } catch(error){
+        return { success: false, message: error.message}
+    }
+}
+
+function generateUniqueParkingString(userId){
+    const randomString = uuidv4(); // UUID with dashes, 36 characters
+    return `${userId}-${randomString}`;
+}
+
+async function generateParkingQRCode(businessName, userData){
+    try {
+        const qrCode = generateUniqueParkingString(userData.id);
+
+        const { data, error } = await supabase
+            .from('parking_qr_codes')
+            .insert([
+                { 
+                    user_id: userData.id, // User ID of customer
+                    business_name: businessName, // Business name of car park where parking is reserved
+                    qr_code: qrCode, // Unique QR code for parking reservation
+                    status: 'active', // Status of parking reservation - set to 'active' by default
+                },
+            ])
+            .single();
+
+        if (error) {
+            return { success: false, message: `An error occurred while generating the parking QR code - ${error}` };
+        }
+
+        return { success: true };
+    } catch (error) {
+        return { success: false, message: `An unexpected error occurred while generating the parking QR code - ${error}` };
     }
 }

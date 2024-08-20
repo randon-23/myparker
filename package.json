@@ -26,10 +26,9 @@
     "react-native-camera": "^4.2.1",
     "react-native-dotenv": "^3.4.11",
     "react-native-elements": "^3.4.3",
-    "react-native-permissions": "3.6.1",
-    "react-native-qrcode-scanner": "^1.5.5",
     "react-native-qrcode-svg": "^6.3.2",
-    "react-native-svg": "^15.5.0"
+    "react-native-svg": "^15.5.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -29,7 +29,6 @@ const BusinessQRCodeScreen = () => {
             }
             setQrCode(qrCodeString);
         } catch (error) {
-            console.error('Error fetching QR code:', error);
             Alert.alert('Error encountered =>', error.message);
         }
     }
@@ -40,7 +39,6 @@ const BusinessQRCodeScreen = () => {
             const newQRCode = await generateQRCode(userData.business_name);
             setQrCode(newQRCode);
         } catch (error) {
-            console.error('Error generating QR code:', error);
             Alert.alert('Error encountered =>', error.message);
         }
     }

@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, StyleSheet, Dimensions } from 'react-native';
 import { requestCameraPermissions } from '../../services/LaunchService.js';
+import { verifyBusinessQRCode } from '../../services/QRCodeService.js';
 import { useAuth } from '../../contexts/AuthContext.js';
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import { Camera, CameraView } from 'expo-camera';
+
+const { width } = Dimensions.get('window');
+const qrSize = width * 0.7;
 
 const QRCodeScannerScreen = ({ navigation }) => {
-    const { user, userData } = useAuth();
+    const { userData } = useAuth();
     const [hasPermission, setHasPermission] = useState(null);
+    const [scanned, setScanned] = useState(false);
 
     useEffect(() => {
         requestCameraPermissions(setHasPermission);
@@ -18,37 +23,48 @@ const QRCodeScannerScreen = ({ navigation }) => {
 
     if (hasPermission === false) {
         return (
-            <View>
+            <View style={styles.container}>
                 <Text>Camera access is required to scan QR codes.</Text>
             </View>
         );
     }
 
-    const handleBarCodeScanned = ({ data }) => {
-        try {
-            console.log('Scanned data:', data);
-            // Process the scanned data based on the userType
-            // if (userType === 'business') {
-            //     // Business-specific logic
-            //     onScanSuccess(data);
-            // } else if (userType === 'customer') {
-            //     // Customer-specific logic
-            //     onScanSuccess(data);
-            // }
-        } catch (error) {
-            console.log('FUCK')
-            // onScanError(error);
+    const handleBarCodeScanned = async ({ data }) => {
+        if (!scanned) {
+            setScanned(true);
+
+            // data is the scanned QR code value, userData is the user's data from the AuthContext
+            const result = await verifyBusinessQRCode(data, userData);
+
+            if (result.success) {
+                Alert.alert(
+                    'Success',
+                    result.message,
+                    [{ text: 'OK', onPress: () => navigation.navigate('CustomerLanding') }]
+                );
+            } else {
+                Alert.alert(
+                    'Error',
+                    `${result.message} - Press OK to scan again.`,
+                    [{ text: 'OK', onPress: () => setScanned(false) }]
+                );
+            }
         }
     };
 
     return (
         <View style={{ flex: 1 }}>
-            <QRCodeScanner
-                onRead={handleBarCodeScanned} // 'onRead' is the correct prop for QRCodeScanner
-                topContent={<Text style={styles.centerText}>Scan the QR code</Text>}
-                bottomContent={<Text style={styles.centerText}>Align the QR code within the frame</Text>}
-                style={{ flex: 1 }}
+            <CameraView
+                onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+                barcodeScannerSettings={{
+                    barcodeTypes: ["qr"],
+                }}
+                style={StyleSheet.absoluteFillObject}
             />
+            <View style={styles.overlay}>
+                <Text style={styles.instructionText}>Align the QR code within the frame</Text>
+                <View style={styles.qrFrame} />
+            </View>
         </View>
     );
 };
@@ -61,10 +77,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    centerText: {
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    instructionText: {
         fontSize: 18,
-        color: '#777',
+        color: '#fff',
         textAlign: 'center',
-        padding: 20,
+        marginBottom: 20,
+    },
+    qrFrame: {
+        width: qrSize,
+        height: qrSize,
+        borderWidth: 2,
+        borderColor: '#fff',
+        borderRadius: 10,
     },
 });
