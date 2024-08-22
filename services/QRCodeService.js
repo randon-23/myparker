@@ -3,7 +3,6 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { Alert } from 'react-native';
 import { Share } from 'react-native';
-import { v4 as uuidv4 } from 'uuid';
 //This is not wrapped in a function like AuthService because it is does not need to influence global state or
 
 // Function to fetch an existing QR code for a business from the database
@@ -43,7 +42,7 @@ export async function generateQRCode(businessName) {
     }
 
     // Return the generated QR code string
-    return data.qr_code;
+    // return data.qr_code;
 }
 
 // Function to generate a unique string based on the identifier. Identifier is either business name in case of businesses or user ID in case of customers

@@ -36,7 +36,8 @@ const BusinessQRCodeScreen = () => {
     const handleGenerateQRCode = async () => {
         try {
             // Generate a new QR code by calling the service function
-            const newQRCode = await generateQRCode(userData.business_name);
+            await generateQRCode(userData.business_name);
+            const newQRCode = await fetchQRCode(userData.business_name);
             setQrCode(newQRCode);
         } catch (error) {
             Alert.alert('Error encountered =>', error.message);

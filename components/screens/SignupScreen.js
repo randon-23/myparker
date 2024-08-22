@@ -32,6 +32,10 @@ const SignupScreen = ({ navigation }) => {
         setBusinessName('');
     };
 
+    const formatBusinessName = (name) => {
+        return name.replace(/\s+/g, '-'); // Replaces spaces with dashes
+    };
+
     {/* Validation Functions */}
     const validateEmail = (email) => {
         const re = /\S+@\S+\.\S+/;
@@ -52,6 +56,7 @@ const SignupScreen = ({ navigation }) => {
     };
 
     const handleSignup = async () => {
+        let formattedBusinessName;
         // Client-side validation before making the signup request
         if (userType === 'customer') {
             if (!contactName || !contactSurname || !validateEmail(email) || !validatePassword(password) || !validateLicensePlate(customerLicensePlate) || !validatePhoneNumber(contactPhoneNumber)) {
@@ -64,6 +69,10 @@ const SignupScreen = ({ navigation }) => {
                 return;
             }
         }
+
+        if(businessName){
+            formattedBusinessName = formatBusinessName(businessName);
+        }
     
         // Data to be sent to the AuthService signup function
         const formData = {
@@ -74,7 +83,7 @@ const SignupScreen = ({ navigation }) => {
             password,
             contactPhoneNumber,
             customerLicensePlate,
-            businessName,
+            businessName: formattedBusinessName,
         };
     
         try {
