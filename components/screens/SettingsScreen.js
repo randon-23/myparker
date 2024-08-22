@@ -95,7 +95,7 @@ const SettingsScreen = ({ navigation }) => {
 
                             <TouchableOpacity
                                 style={styles.optionButton}
-                                //onPress={() => navigation.navigate('AllTicketsScreen')}
+                                onPress={() => navigation.navigate('AllTicketsScreen')}
                             >
                                 <Icon
                                     name="car"
@@ -129,7 +129,7 @@ const SettingsScreen = ({ navigation }) => {
 
                             <TouchableOpacity
                                 style={styles.optionButton}
-                                //onPress={() => navigation.navigate('AllTicketsScreen')}
+                                onPress={() => navigation.navigate('AllTicketsScreen')}
                             >
                                 <Icon
                                     name="car"

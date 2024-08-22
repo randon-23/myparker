@@ -130,11 +130,6 @@ const LoginScreen = ({ navigation }) => {
         >
           <Text style={[styles.buttonText, { color: theme.primaryColor }]}>Sign Up</Text>
         </TouchableOpacity>
-
-        {/* Forgot Password */}
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -199,10 +194,5 @@ const styles = StyleSheet.create({
   buttonOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-  },
-  forgotPassword: {
-    color: '#FFF',
-    textAlign: 'center',
-    marginTop: 10,
-  },
+  }
 });

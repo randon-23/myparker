@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { CustomerLandingScreen, SettingsScreen, QRCodeScannerScreen } from "../components/screens/screens.js";
+import { CustomerLandingScreen, SettingsScreen, QRCodeScannerScreen, AllTicketsScreen } from "../components/screens/screens.js";
 import { TouchableOpacity, Image, StatusBar } from "react-native";
 import { Icon } from 'react-native-elements';
 import { useNavigation } from "@react-navigation/native";
@@ -46,6 +46,11 @@ const CustomerStack = () => {
                     name="QRCodeScanner"
                     component={QRCodeScannerScreen}
                     options={{ headerShown: true, title: 'Scan QR Code', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center' }}
+                />
+                <Stack.Screen
+                    name="AllTicketsScreen"
+                    component={AllTicketsScreen}
+                    options={{ headerShown: true, title: 'Your Parking Ticket History', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center'}}
                 />
             </Stack.Navigator>
         </>

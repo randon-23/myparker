@@ -6,3 +6,4 @@ export{ default as LoadingScreen } from './LoadingScreen.js';
 export{ default as SettingsScreen } from './SettingsScreen.js';
 export{ default as BusinessQRCodeScreen } from './BusinessQRCodeScreen.js';
 export{ default as QRCodeScannerScreen } from './QRCodeScannerScreen.js';
+export{ default as AllTicketsScreen } from './AllTicketsScreen.js';

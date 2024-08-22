@@ -302,3 +302,40 @@ export async function completeParkingTicket(ticketID){
         return { success: false, message: `An unexpected error occurred while completing the parking ticket - ${error}` };
     }
 }
+
+// Fetch all tickets for a customer
+export async function fetchCustomerTickets(userId) {
+    try {
+        const { data, error } = await supabase
+            .from('parking_qr_codes')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (error) {
+            return { success: false, message: `An error occurred while fetching tickets - ${error.message}` };
+        }
+
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, message: `An unexpected error occurred while fetching tickets - ${error.message}` };
+    }
+}
+
+// Fetch all tickets for a business
+export async function fetchBusinessTickets(businessName) {
+    try {
+        const { data, error } = await supabase
+            .from('parking_qr_codes')
+            .select('*')
+            .eq('business_name', businessName)
+            .in('status', ['active', 'validated']);
+
+        if (error) {
+            return { success: false, message: `An error occurred while fetching business tickets - ${error.message}` };
+        }
+
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, message: `An unexpected error occurred while fetching business tickets - ${error.message}` };
+    }
+}
