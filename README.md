@@ -1,0 +1,2 @@
+This application is solely developed for use in Android OS - no hardware was available for testing on iOS i.e. physical phone and emulator was Windows
+To run this application, make sure you have Android Studio
