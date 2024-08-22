@@ -46,17 +46,21 @@ export async function generateQRCode(businessName) {
     return data.qr_code;
 }
 
-// Function to generate a unique string based on the business name
+// Function to generate a unique string based on the identifier. Identifier is either business name in case of businesses or user ID in case of customers
 // Returns a string, does not interact with the database, helper function
-function generateUniqueString(businessName) {
+function generateUniqueString(identifier) {
     // Create a unique string using the business name and a random alphanumeric string
-    const randomString = Math.random().toString(36).substring(2, 15);
-    return `${businessName}-${randomString}`;
-}
+    // https://www.youtube.com/watch?v=R9PpdFt2ygM
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const length = 32
 
-function generateUniqueParkingString(userId){
-    const randomString = uuidv4(); // UUID with dashes, 36 characters
-    return `${userId}-${randomString}`;
+    let result = ''
+    
+    for(let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length))
+    }
+
+    return `${identifier}-${result}`;
 }
 
 // Function to download the QR code as a image file to device
@@ -168,14 +172,44 @@ export async function verifyBusinessQRCode(businessQRCodeValue, userData) {
     }
 }
 
-function generateUniqueParkingString(userId){
-    const randomString = uuidv4(); // UUID with dashes, 36 characters
-    return `${userId}-${randomString}`;
+export async function validateCustomerParkingQRCode(parkingQRCodeValue, userData) {
+    try{
+        const {data, error } = await supabase
+            .from('parking_qr_codes')
+            .select('*')
+            .eq('qr_code', parkingQRCodeValue)
+            .eq('status', 'active')
+            .eq('business_name', userData.business_name)
+            .single();
+        
+        if(error){
+            if(error.details === "The result contains 0 rows"){
+                return { success: false, message: 'An unexpected error when validating parking (pre-status update)' };
+            }
+        }
+
+        if(data){
+            // Update the status of the parking QR code to 'validated'
+            const { data: updatedData, error: updateError } = await supabase
+                .from('parking_qr_codes')
+                .update({ status: 'validated' })
+                .eq('id', data.id)
+                .single();
+
+            if(updateError){
+                return { success: false, message: `An error occurred while updating the parking status - ${updateError}` };
+            }
+
+            return { success: true, message: 'Parking validated' };
+        }
+    } catch(error){
+        return { success: false, message: error.message}
+    }
 }
 
 async function generateParkingQRCode(businessName, userData){
     try {
-        const qrCode = generateUniqueParkingString(userData.id);
+        const qrCode = generateUniqueString(userData.id);
 
         const { data, error } = await supabase
             .from('parking_qr_codes')
@@ -196,5 +230,75 @@ async function generateParkingQRCode(businessName, userData){
         return { success: true };
     } catch (error) {
         return { success: false, message: `An unexpected error occurred while generating the parking QR code - ${error}` };
+    }
+}
+
+// Ticket screens
+export async function fetchActiveParking(userData) {
+    try{
+        const { data, error } = await supabase
+            .from('parking_qr_codes')
+            .select('*')
+            .eq('user_id', userData.id)
+            .in('status', ['active', 'validated'])
+            .single(); //Retrieve active user ticket - ticket is considered active if its status is not 'complete'
+
+        if(error){
+            if(error.details === "The result contains 0 rows"){
+                return { success: false, data: null, message: 'No active parking found' };
+            }
+        }
+
+        return { success: true, data };
+    } catch(error){
+        return { success: false, message: `An error occurred while fetching active parking - ${error.message}` };
+    }
+}
+
+export async function fetchTicketData(userData) {
+    try {
+        let query;
+        
+        if (userData.usertype === 'customer') {
+            query = supabase
+                .from('parking_qr_codes')
+                .select('*')
+                .eq('user_id', userData.id);
+        } else if (userData.usertype === 'business') {
+            query = supabase
+                .from('parking_qr_codes')
+                .select('*')
+                .eq('business_name', userData.business_name)
+                .eq('status', 'active');
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            throw error;
+        }
+
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, message: `An error occurred while fetching ticket data - ${error.message}` };
+    }
+}
+
+//Used to override console verification on exit of car park
+export async function completeParkingTicket(ticketID){
+    try{
+        const { data, error } = await supabase
+            .from('parking_qr_codes')
+            .update({ status: 'complete' })
+            .eq('id', ticketID)
+            .single();
+
+        if(error){
+            return { success: false, message: `An error occurred while completing the parking ticket - ${error}` };
+        }
+
+        return { success: true };
+    } catch(error){
+        return { success: false, message: `An unexpected error occurred while completing the parking ticket - ${error}` };
     }
 }

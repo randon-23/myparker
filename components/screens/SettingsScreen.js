@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { Icon } from 'react-native-elements';
 import { useAuthService } from '../../services/AuthService.js';
+import { fetchActiveParking } from '../../services/QRCodeService.js';
 
 const SettingsScreen = ({ navigation }) => {
     const { user, userData } = useAuth()
     const { logout } = useAuthService()
+    const [activeTicket, setActiveTicket] = useState(null);
+
+    useEffect(() => {
+        if(userData.usertype === 'customer'){
+            const loadActiveParking = async () => {
+                const result = await fetchActiveParking(userData);
+    
+                if (result.success) {
+                    setActiveTicket(result.data);
+                } else {
+                    if (result.message !== 'No active parking found') {
+                        Alert.alert('Error', result.message);
+                    }
+                }
+            };
+    
+            loadActiveParking();
+        }
+    }, [userData]);
 
     const handleLogout = async () => {
         try {
@@ -58,48 +78,70 @@ const SettingsScreen = ({ navigation }) => {
                 {/* Menu Options Section */}
                 <View style={styles.menuOptionsContainer}>
                     {userData.usertype === 'business' ? (
-                        <TouchableOpacity
+                        <View>
+                            <TouchableOpacity
                             style={styles.optionButton}
                             onPress={() => navigation.navigate('BusinessQRCode')}
-                        >
-                            <Icon
-                                name="qrcode"
-                                type="font-awesome"
-                                size={24}
-                                color={'#FFF'}
-                                style={styles.optionIcon}
-                            />
-                            <Text style={styles.optionText}>Your Business QR Code</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity
-                            style={styles.optionButton}
-                            //onPress={() => navigation.navigate('ParkingQRCode')}
-                        >
-                            <Icon
-                                name="qrcode"
-                                type="font-awesome"
-                                size={24}
-                                color={'#FFF'}
-                                style={styles.optionIcon}
-                            />
-                            <Text style={styles.optionText}>Your Active Parking QR Code</Text>
-                        </TouchableOpacity>
-                    )}
+                            >
+                                <Icon
+                                    name="qrcode"
+                                    type="font-awesome"
+                                    size={24}
+                                    color={'#FFF'}
+                                    style={styles.optionIcon}
+                                />
+                                <Text style={styles.optionText}>Your Business QR Code</Text>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.optionButton}
-                        //onPress={() => navigation.navigate('UpdateProfile')}
-                    >
-                        <Icon
-                            name="user"
-                            type="font-awesome"
-                            size={24}
-                            color={'#FFF'}
-                            style={styles.optionIcon}
-                        />
-                        <Text style={styles.optionText}>Update Profile Details</Text>
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.optionButton}
+                                //onPress={() => navigation.navigate('AllTicketsScreen')}
+                            >
+                                <Icon
+                                    name="car"
+                                    type="font-awesome"
+                                    size={24}
+                                    color={'#FFF'}
+                                    style={styles.optionIcon}
+                                />
+                                <Text style={styles.optionText}>Your Business' Active Parkings</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        <View>
+                            <TouchableOpacity
+                                style={[
+                                    styles.optionButton,
+                                    activeTicket ? { backgroundColor: 'lightgreen' } : { opacity: 0.5 }
+                                ]}
+                                onPress={() => navigation.navigate('CustomerLanding')}
+                                disabled={!activeTicket}
+                            >
+                                <Icon
+                                    name="qrcode"
+                                    type="font-awesome"
+                                    size={24}
+                                    color={'#FFF'}
+                                    style={styles.optionIcon}
+                                />
+                                <Text style={styles.optionText}>Your Active Parking QR Code</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.optionButton}
+                                //onPress={() => navigation.navigate('AllTicketsScreen')}
+                            >
+                                <Icon
+                                    name="car"
+                                    type="font-awesome"
+                                    size={24}
+                                    color={'#FFF'}
+                                    style={styles.optionIcon}
+                                />
+                                <Text style={styles.optionText}>Your Parking Ticket History</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
             <View style={styles.logoutButtonContainer}>

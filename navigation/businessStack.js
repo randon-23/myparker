@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { BusinessLandingScreen, SettingsScreen, BusinessQRCodeScreen } from "../components/screens/screens.js";
+import { BusinessLandingScreen, SettingsScreen, BusinessQRCodeScreen, QRCodeScannerScreen } from "../components/screens/screens.js";
 import { TouchableOpacity, Image, StatusBar } from "react-native";
 import { Icon } from 'react-native-elements';
 import { useTheme } from "../contexts/ThemeContext.js";
@@ -47,6 +47,11 @@ const BusinessStack = () => {
                     name="BusinessQRCode"
                     component={BusinessQRCodeScreen}
                     options={{ headerShown: true, title: 'Your Business QR Code', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center'}}
+                />
+                <Stack.Screen
+                    name="QRCodeScanner"
+                    component={QRCodeScannerScreen}
+                    options={{ headerShown: true, title: 'Scan Customer QR Code', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center'}}
                 />
             </Stack.Navigator>
         </>

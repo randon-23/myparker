@@ -15,6 +15,7 @@ const BusinessLandingScreen = ({ navigation }) => {
 
             <TouchableOpacity
                 style={[styles.button, { backgroundColor: theme.primaryColor }]}
+                onPress={() => navigation.navigate('QRCodeScanner')}
                 >
                 <Icon
                     name="qrcode"

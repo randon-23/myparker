@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert, StyleSheet, Dimensions } from 'react-native';
 import { requestCameraPermissions } from '../../services/LaunchService.js';
-import { verifyBusinessQRCode } from '../../services/QRCodeService.js';
+import { verifyBusinessQRCode, validateCustomerParkingQRCode } from '../../services/QRCodeService.js';
 import { useAuth } from '../../contexts/AuthContext.js';
-import { Camera, CameraView } from 'expo-camera';
+import { CameraView } from 'expo-camera';
 
 const { width } = Dimensions.get('window');
 const qrSize = width * 0.7;
 
+//Common component for scanning QR codes
 const QRCodeScannerScreen = ({ navigation }) => {
     const { userData } = useAuth();
     const [hasPermission, setHasPermission] = useState(null);
@@ -33,21 +34,39 @@ const QRCodeScannerScreen = ({ navigation }) => {
         if (!scanned) {
             setScanned(true);
 
-            // data is the scanned QR code value, userData is the user's data from the AuthContext
-            const result = await verifyBusinessQRCode(data, userData);
+            if(userData.usertype === 'customer'){
+                // data is the scanned QR code value, userData is the user's data from the AuthContext
+                const result = await verifyBusinessQRCode(data, userData);
 
-            if (result.success) {
-                Alert.alert(
-                    'Success',
-                    result.message,
-                    [{ text: 'OK', onPress: () => navigation.navigate('CustomerLanding') }]
-                );
-            } else {
-                Alert.alert(
-                    'Error',
-                    `${result.message} - Press OK to scan again.`,
-                    [{ text: 'OK', onPress: () => setScanned(false) }]
-                );
+                if (result.success) {
+                    Alert.alert(
+                        'Success',
+                        result.message,
+                        [{ text: 'OK', onPress: () => navigation.push('CustomerLanding') }]
+                    );
+                } else {
+                    Alert.alert(
+                        'Error',
+                        `${result.message} - Press OK to scan again.`,
+                        [{ text: 'OK', onPress: () => setScanned(false) }]
+                    );
+                }
+            } else if(userData.usertype === 'business') {
+                const result = await validateCustomerParkingQRCode(data, userData);
+
+                if(result.success) {
+                    Alert.alert(
+                        'Success',
+                        result.message,
+                        [{ text: 'OK', onPress: () => navigation.push('BusinessLanding') }]
+                    );
+                } else {
+                    Alert.alert(
+                        'Error',
+                        `${result.message} - Press OK to scan again.`,
+                        [{ text: 'OK', onPress: () => setScanned(false) }]
+                    );
+                }
             }
         }
     };
