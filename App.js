@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { StyleSheet } from 'react-native';
 import MainNavigator from './navigation/MainNavigation';
 import { AuthProvider } from '../myparker/contexts/AuthContext.js';
 import { ThemeProvider } from '../myparker/contexts/ThemeContext.js';
