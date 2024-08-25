@@ -4,15 +4,17 @@ import { useAuth } from '../../contexts/AuthContext.js';
 import { useTheme } from "../../contexts/ThemeContext.js";
 import { Icon } from 'react-native-elements';
 
+// BusinessLandingScreen component - landing screen for business users
 const BusinessLandingScreen = ({ navigation }) => {
-    const { userData } = useAuth();
-    const { theme } = useTheme();
+    const { userData } = useAuth(); // Get the user data from the AuthContext
+    const { theme } = useTheme();  // Get the theme from the ThemeContext
    
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Welcome {userData.business_name}!</Text>
             <Text style={styles.subtitle}>To scan a customer's parking QR Code, press the button below!</Text>
 
+            {/* Button to navigate to the QRCodeScanner screen */}
             <TouchableOpacity
                 style={[styles.button, { backgroundColor: theme.primaryColor }]}
                 onPress={() => navigation.navigate('QRCodeScanner')}
@@ -28,6 +30,7 @@ const BusinessLandingScreen = ({ navigation }) => {
                 <Text style={[styles.buttonText, { color: theme.backgroundColor }]}>Scan Customer QR Code</Text>
             </TouchableOpacity>
 
+            {/* Button to navigate to the BusinessQRCode screen */}
             <Text style={styles.subtitle}>To generate, or view your already generated QR Code which customers will scan, press the button below!</Text>
             <TouchableOpacity
                 style={[styles.button, { backgroundColor: theme.primaryColor }]}

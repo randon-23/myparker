@@ -5,7 +5,8 @@ import { useAuthService } from '../../services/AuthService';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const SignupScreen = ({ navigation }) => {
-    //This is a user type that will determine the state of the login screen
+    // This is a user type that will determine the state of the login screen
+    // By default, the user type is set to customer
     const [userType, setUserType] = useState('customer');
     //All common to both user types
     const [email, setEmail] = useState('');
@@ -32,29 +33,36 @@ const SignupScreen = ({ navigation }) => {
         setBusinessName('');
     };
 
+    // Function to format business name to remove spaces and replace with dashes
     const formatBusinessName = (name) => {
         return name.replace(/\s+/g, '-'); // Replaces spaces with dashes
     };
 
-    {/* Validation Functions */}
+    // Validation functions
+
+    // Function to validate email format
     const validateEmail = (email) => {
         const re = /\S+@\S+\.\S+/;
         return re.test(email);
     };
 
+    // Function to validate password length
     const validatePassword = (password) => {
         return password.length >= 6;
     };
 
+    // Function to validate license plate format (Local license plates follow format ABC-123)
     const validateLicensePlate = (licensePlate) => {
         const re = /^[A-Z]{3}-\d{3}$/;
         return re.test(licensePlate);
     };
 
+    // Function to validate phone number
     const validatePhoneNumber = (phoneNumber) => {
         return phoneNumber.length > 0;
     };
 
+    // Handler function for signup button press
     const handleSignup = async () => {
         let formattedBusinessName;
         // Client-side validation before making the signup request
@@ -70,6 +78,7 @@ const SignupScreen = ({ navigation }) => {
             }
         }
 
+        // Format business name to remove spaces and replace with dashes
         if(businessName){
             formattedBusinessName = formatBusinessName(businessName);
         }
@@ -89,7 +98,8 @@ const SignupScreen = ({ navigation }) => {
         try {
             // Attempt to sign up the user
             const response = await signup(formData);
-    
+            
+            // Display success message if signup is successful
             if (response.success) {
                 Alert.alert(
                     'Signup Successful!',
@@ -99,7 +109,7 @@ const SignupScreen = ({ navigation }) => {
                     ]
                 );
             } else {
-                // Display server error message if signup failed depending on error message
+                // Display specific server error message if signup failed depending on error message
                 if(response.error.includes(`duplicate key value violates unique constraint "users_license_plate_key"`)) {
                     alert(`Signup failed - License plate already exists`)
                 } else if(response.error.includes(`duplicate key value violates unique constraint "users_phone_number_key"`)){
@@ -116,6 +126,7 @@ const SignupScreen = ({ navigation }) => {
         }
     };
 
+    // Return the form and perform conditional rendering based on user type, validation is performed on the client side as text is typed in
     return (
         <View style={[styles.container, { backgroundColor: theme.backgroundColor}]}>
             <Text style={styles.title}>Create Account</Text>

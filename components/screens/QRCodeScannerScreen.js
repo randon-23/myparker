@@ -8,20 +8,23 @@ import { CameraView } from 'expo-camera';
 const { width } = Dimensions.get('window');
 const qrSize = width * 0.7;
 
-//Common component for scanning QR codes
+//Common component for scanning QR codes - CameraView is a custom component that wraps the Expo Camera component
 const QRCodeScannerScreen = ({ navigation }) => {
-    const { userData } = useAuth();
-    const [hasPermission, setHasPermission] = useState(null);
-    const [scanned, setScanned] = useState(false);
+    const { userData } = useAuth(); // Get the user data from the AuthContext
+    const [hasPermission, setHasPermission] = useState(null); // State to get and store camera permissions
+    const [scanned, setScanned] = useState(false); // State to track if a QR code has been scanned
 
+    // One time effect to check camera permissions have been already granted
     useEffect(() => {
         requestCameraPermissions(setHasPermission);
     }, []);
 
+    // If permissions are still being checked, show a loading message
     if (hasPermission === null) {
         return <Text>Checking camera permissions...</Text>;
     }
 
+    // If permissions are denied, show a message to the user and do not render the camera view
     if (hasPermission === false) {
         return (
             <View style={styles.container}>
@@ -29,15 +32,17 @@ const QRCodeScannerScreen = ({ navigation }) => {
             </View>
         );
     }
-
+    
+    // Handler function which executes functionaliyu depending on the user type. Data prop is scanned QR code value
     const handleBarCodeScanned = async ({ data }) => {
         if (!scanned) {
             setScanned(true);
 
             if(userData.usertype === 'customer'){
                 // data is the scanned QR code value, userData is the user's data from the AuthContext
-                const result = await verifyBusinessQRCode(data, userData);
+                const result = await verifyBusinessQRCode(data, userData); // Call the service function to verify the QR code, which finds the business name and checks if the user has an active ticket
 
+                // Show an alert based on the result of the verification
                 if (result.success) {
                     Alert.alert(
                         'Success',
@@ -52,8 +57,9 @@ const QRCodeScannerScreen = ({ navigation }) => {
                     );
                 }
             } else if(userData.usertype === 'business') {
-                const result = await validateCustomerParkingQRCode(data, userData);
+                const result = await validateCustomerParkingQRCode(data, userData); // Call the service function to validate the customer's parking ticket
 
+                // Show an alert based on the result of the validation
                 if(result.success) {
                     Alert.alert(
                         'Success',
@@ -71,6 +77,7 @@ const QRCodeScannerScreen = ({ navigation }) => {
         }
     };
 
+    // Render the CameraView component with the barcode scanner settings along with the overlay for the QR code frame
     return (
         <View style={{ flex: 1 }}>
             <CameraView

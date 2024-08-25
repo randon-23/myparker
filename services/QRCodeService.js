@@ -59,6 +59,7 @@ function generateUniqueString(identifier) {
         result += characters.charAt(Math.floor(Math.random() * characters.length))
     }
 
+    // Returns the unique string as a concatenation of the identifier (business name or user id) and the random string
     return `${identifier}-${result}`;
 }
 
@@ -102,6 +103,9 @@ export async function downloadQRCode(qrCodeRef, userData) {
     }
 }
 
+// Function to share the QR code as a image file to other apps on the device
+// Interacts with the device's share API, client-side only
+// Parameters are the QR code reference and the user data from the AuthContext
 export async function shareQRCode(qrCodeRef, userData) {
     try{
         if (qrCodeRef.current) {
@@ -171,8 +175,12 @@ export async function verifyBusinessQRCode(businessQRCodeValue, userData) {
     }
 }
 
+// Function to validate a customer's parking QR code
+// Interacts with the database and returns a success object and message which is logged to an alert element on the business users client side
+// Parameters are the parking QR code value obtained and the client user data from the AuthContext
 export async function validateCustomerParkingQRCode(parkingQRCodeValue, userData) {
     try{
+        // Fetch the parking QR code from the database if it exists
         const {data, error } = await supabase
             .from('parking_qr_codes')
             .select('*')
@@ -187,6 +195,7 @@ export async function validateCustomerParkingQRCode(parkingQRCodeValue, userData
             }
         }
 
+        // If the parking QR code exists and is active in the database, update the status to 'validated'
         if(data){
             // Update the status of the parking QR code to 'validated'
             const { data: updatedData, error: updateError } = await supabase
@@ -199,6 +208,7 @@ export async function validateCustomerParkingQRCode(parkingQRCodeValue, userData
                 return { success: false, message: `An error occurred while updating the parking status - ${updateError}` };
             }
 
+            // Return success message to be handled in client side handler and displayed in alert
             return { success: true, message: 'Parking validated' };
         }
     } catch(error){
@@ -206,8 +216,11 @@ export async function validateCustomerParkingQRCode(parkingQRCodeValue, userData
     }
 }
 
+// Function used to generate a QR Code for a parking instance as a customer
+// Parameters are the business name obtained from scanning the business QR Code and the user data from the AuthContext
 async function generateParkingQRCode(businessName, userData){
     try {
+        // Generate a unique QR code for the parking reservation
         const qrCode = generateUniqueString(userData.id);
 
         const { data, error } = await supabase
@@ -226,6 +239,7 @@ async function generateParkingQRCode(businessName, userData){
             return { success: false, message: `An error occurred while generating the parking QR code - ${error}` };
         }
 
+        // Return success message to be handled in client side handler and displayed in alert, if successful, QR Code component is displayed on client side after it once again fetches the newly generated QR code
         return { success: true };
     } catch (error) {
         return { success: false, message: `An unexpected error occurred while generating the parking QR code - ${error}` };
@@ -233,6 +247,8 @@ async function generateParkingQRCode(businessName, userData){
 }
 
 // Ticket screens
+// Fetch active parking ticket for a user
+// Called in useEffect in CustomerLandingScreen.js upon each component render to check for any active/validated parking ticket
 export async function fetchActiveParking(userData) {
     try{
         const { data, error } = await supabase
@@ -254,21 +270,25 @@ export async function fetchActiveParking(userData) {
     }
 }
 
+// Fucntion to fetch ticket data for a user. If business user, fetches all active tickets for the business
+// If customer user, fetches all tickets for the customer
+// Parameters are the user data from the AuthContext
+// Called when button pressed on Settings page to view all tickets
 export async function fetchTicketData(userData) {
     try {
         let query;
         
         if (userData.usertype === 'customer') {
             query = supabase
-                .from('parking_qr_codes')
+                .from('parking_qr_codes') //Query parking_qr_codes table
                 .select('*')
-                .eq('user_id', userData.id);
+                .eq('user_id', userData.id); // Select all tickets in table which have userData.id for user_id
         } else if (userData.usertype === 'business') {
             query = supabase
-                .from('parking_qr_codes')
+                .from('parking_qr_codes') //Query parking_qr_codes table
                 .select('*')
-                .eq('business_name', userData.business_name)
-                .eq('status', 'active');
+                .eq('business_name', userData.business_name) // Select all tickets in table which have userData.business_name for business_name
+                .eq('status', 'active'); // Select all tickets in table which have status 'active'
         }
 
         const { data, error } = await query;
@@ -283,7 +303,10 @@ export async function fetchTicketData(userData) {
     }
 }
 
-//Used to override console verification on exit of car park
+// Function to complete a parking ticket
+// Used to override console verification on exit of car park
+// Parameters are the ticket ID
+// This is to simulate a user showing the ticket to a QR Code reader at the exit console
 export async function completeParkingTicket(ticketID){
     try{
         const { data, error } = await supabase
@@ -303,12 +326,14 @@ export async function completeParkingTicket(ticketID){
 }
 
 // Fetch all tickets for a customer
+// Parameters are the user data from the AuthContext (userData.id)
+// Called when button pressed on Settings page to view all tickets
 export async function fetchCustomerTickets(userId) {
     try {
         const { data, error } = await supabase
-            .from('parking_qr_codes')
+            .from('parking_qr_codes') //Query parking_qr_codes table
             .select('*')
-            .eq('user_id', userId);
+            .eq('user_id', userId); // Select all tickets in table which have userId for user_id
 
         if (error) {
             return { success: false, message: `An error occurred while fetching tickets - ${error.message}` };
@@ -321,13 +346,15 @@ export async function fetchCustomerTickets(userId) {
 }
 
 // Fetch all tickets for a business
+// Parameters are the business name from the AuthContext (userData.business_name)
+// Called when button pressed on Settings page to view all tickets
 export async function fetchBusinessTickets(businessName) {
     try {
         const { data, error } = await supabase
-            .from('parking_qr_codes')
+            .from('parking_qr_codes') //Query parking_qr_codes table
             .select('*')
-            .eq('business_name', businessName)
-            .in('status', ['active', 'validated']);
+            .eq('business_name', businessName) // Select all tickets in table which have businessName for business_name
+            .in('status', ['active', 'validated']); // Select all tickets in table which have status 'active' or 'validated'
 
         if (error) {
             return { success: false, message: `An error occurred while fetching business tickets - ${error.message}` };

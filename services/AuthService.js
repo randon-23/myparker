@@ -16,13 +16,18 @@ export const useAuthService = () => {
                 .eq('email', email)
                 .eq('usertype', userType)
                 .single();
-    
+            
+            // If the user type doesn't match, throw an error
             if (userError) throw new Error('Account is not of selected type');
             
+            // Proceed with authentication using email and password
             const { data: { session }, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw new Error('Invalid email or password');
             
-            updateTheme(userType) //Set theme based on user type
+            // Update the theme based on the user type
+            updateTheme(userType)
+
+            // Return the session if no errors are thrown, which will be used to authenticate future requests and contains the user's data and their bearer token
             return { success: true, session };
         } catch (error) {
             return { success: false, error: error.message };
@@ -31,13 +36,18 @@ export const useAuthService = () => {
         }
     };
     
+    // Function to handle user logout
     const logout = async () => {
         setLoading(true);
         try{
+            // Sign the user out from Supabase authentication
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
             
-            updateTheme('customer') //When navigating back to home screen always reset theme
+            // Reset the theme to the default (customer) after logout
+            updateTheme('customer')
+
+            // Return success if no errors are thrown
             return { success: true };
         } catch(error){
             return { success: false, error: error.message };
@@ -46,15 +56,18 @@ export const useAuthService = () => {
         }
     };
     
+    // Function to handle user signup
     const signup = async (formData) => {
+        // Destructure the form data sent from the signup form
         const { userType, contactName, contactSurname, email, password, contactPhoneNumber, customerLicensePlate, businessName } = formData;
         setLoading(true);
         try {
+            // Sign up the user with Supabase authentication using email and password
+            // This will create a user in the auth.users table
             const { data: { user }, error } = await supabase.auth.signUp({
                 email,
                 password,
             });
-            console.log('pre error check')
             if (error) throw error;
             console.log('Supabase initial sign up complete')
     
@@ -71,6 +84,8 @@ export const useAuthService = () => {
                 throw new Error('Business name is required');
             }
     
+            // Insert user data into the 'users' table
+            // This will create a record in the users table with the user's additional data
             const { error: userInsertError } = await supabase
                 .from('users')
                 .insert({
@@ -84,6 +99,7 @@ export const useAuthService = () => {
                     phone_number: contactPhoneNumber,
                 });
     
+            // If there was an error inserting user data into 'users', attempt to delete the user from auth
             if (userInsertError) {
                 // Attempt to clean up by deleting the user from the auth.users table
                 const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(user.id);

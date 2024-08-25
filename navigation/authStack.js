@@ -8,6 +8,7 @@ const Stack = createStackNavigator();
 const AuthStack = () => {
     return (
         <Stack.Navigator>
+            {/* Login and Signup screens are part of the authentication flow */}
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }}  />
             <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: true, title: 'Sign Up', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center'}} />
         </Stack.Navigator>

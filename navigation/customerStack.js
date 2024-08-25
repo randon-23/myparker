@@ -9,12 +9,16 @@ import { useTheme } from "../contexts/ThemeContext.js";
 const Stack = createStackNavigator();
 
 const CustomerStack = () => {
+    // Get the theme and navigation objects from the ThemeContext and React Navigation
+    // Navigation is declared explicitly here to allow for navigation to the Settings screen from the CustomerLanding screen header
     const { theme } = useTheme();
     const navigation = useNavigation();
     return (
         <>
             <StatusBar barStyle="light-content" />
             <Stack.Navigator>
+                {/* CustomerLanding screen is the main screen for the customer */}
+                {/* Logo is displayed instead of a title */}
                 <Stack.Screen 
                     name="CustomerLanding" 
                     component={CustomerLandingScreen}

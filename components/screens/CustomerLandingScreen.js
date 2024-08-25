@@ -8,17 +8,20 @@ import { fetchActiveParking, completeParkingTicket } from '../../services/QRCode
 import QRCODE from '../elements/qrcode.js';
 
 const CustomerLandingScreen = ({ navigation }) => {
-    const { userData } = useAuth();
-    const { theme } = useTheme();
-    const [activeTicket, setActiveTicket] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { userData } = useAuth(); // Get the userData from the AuthContext
+    const { theme } = useTheme(); // Get the theme from the ThemeContext
+    const [activeTicket, setActiveTicket] = useState(null); // State to store the active ticket
+    const [loading, setLoading] = useState(true); // State to track if the active ticket is loading
 
+    // One time effect to fetch the active parking ticket
     useEffect(() => {
+        // Handler function to fetch the active parking ticket
         const loadActiveParking = async () => {
             setLoading(true);
             const result = await fetchActiveParking(userData);
             setLoading(false);
 
+            // If the result is successful, set the active ticket state to the data
             if (result.success) {
                 setActiveTicket(result.data);
             } else {
@@ -28,9 +31,13 @@ const CustomerLandingScreen = ({ navigation }) => {
             }
         };
 
+        // Call the loadActiveParking function
         loadActiveParking();
-    }, [userData]);
+    }, [userData]); // Run the effect when the userData changes
 
+    // Effect to subscribe to parking status changes
+    // This listens for changes to the parking_qr_codes table where the user_id is the current user's ID
+    // This is enabled through the Supabase Realtime feature, where I enabled it in the parking_qr_codes table and filtered by user_id
     useEffect(() => {
         let subscription;
 
@@ -44,7 +51,7 @@ const CustomerLandingScreen = ({ navigation }) => {
                     (payload) => {
                         if (payload.new.status === 'validated' && payload.new.id === activeTicket.id) {
                             setActiveTicket(payload.new); // Update the ticket when status changes to validated
-                            supabase.removeChannel(subscription); // Remove the subscription after the status changes
+                            supabase.removeChannel(subscription); // Remove the subscription after the status changes, we only want to listen for one change. This is important even for scalability reasons.
                             console.log('Unsubscribed from parking status changes after ticket validation');
                         }
                     }
@@ -63,7 +70,9 @@ const CustomerLandingScreen = ({ navigation }) => {
         };
     }, [activeTicket, userData]);
 
+    // Handler function to complete the parking ticket, to override the console completion
     const handleCompletePress = async () => {
+        // Call the service function to change the status of the current active ticket from validated to complete
         const result = await completeParkingTicket(activeTicket.id);
         if (result.success) {
             setActiveTicket(null); // Update the state to reflect the completed status
@@ -72,6 +81,7 @@ const CustomerLandingScreen = ({ navigation }) => {
         }
     };
 
+    // If active ticket is still being fetched, show a loading message
     if (loading) {
         return (
             <View style={styles.container}>
@@ -80,6 +90,8 @@ const CustomerLandingScreen = ({ navigation }) => {
         );
     }
 
+    // If there is an active ticket, show the active ticket details, otherwise show the welcome message
+    // Along with the buttons to scan a QR code or view ticket history
     return (
         <View style={styles.container}>
             {activeTicket ? (
@@ -93,6 +105,7 @@ const CustomerLandingScreen = ({ navigation }) => {
                         <QRCODE value={activeTicket.qr_code} />
                         <Text style={[styles.subtitle, {marginTop: 15}]}>Location: {activeTicket.business_name}</Text>
                         <Text style={styles.subtitle}>Reference ID: {activeTicket.id}</Text>
+                        {/* Corroborates change which is listened for by channel and adjusts ticket status to user*/}
                         <Text
                             style={[
                                 styles.statusText,
@@ -102,7 +115,8 @@ const CustomerLandingScreen = ({ navigation }) => {
                             {activeTicket.status === 'active' ? 'ACTIVE' : 'VALIDATED'}
                         </Text>
                     </View>
-
+                    
+                    {/* The user can press this button to simulate completing the parking process and exiting the car park*/}
                     <View style={styles.statusContainer}>
                         {activeTicket.status === 'validated' && (
                             <TouchableOpacity
@@ -123,6 +137,7 @@ const CustomerLandingScreen = ({ navigation }) => {
                 </View>
             ) : (
                 <>
+                {/* Shows available options to this user type */}
                     <View style={styles.welcomeContainer}>
                         <Text style={styles.title}>Welcome {userData.contact_name}!</Text>
                         <Text style={styles.subtitle}>

@@ -33,6 +33,7 @@ const BusinessQRCodeScreen = () => {
         }
     }
 
+    // Handler function to generate a new QR code if the business user does not have one
     const handleGenerateQRCode = async () => {
         try {
             // Generate a new QR code by calling the service function
@@ -44,6 +45,7 @@ const BusinessQRCodeScreen = () => {
         }
     }
 
+    // Handler function to download the QR code upon pressing the Download QR Code button
     const handleDownloadQRCode = async () => {
         // Check if the app has permission to access the media library
         const { status } = await MediaLibrary.getPermissionsAsync();
@@ -64,7 +66,7 @@ const BusinessQRCodeScreen = () => {
                             // Request permission
                             const { status: newStatus } = await MediaLibrary.requestPermissionsAsync();
                             if (newStatus === 'granted') {
-                                await downloadQRCode(qrCodeRef, userData);
+                                await downloadQRCode(qrCodeRef, userData); // Call actual download function if permission is granted
                             }
                         },
                     },
@@ -77,12 +79,14 @@ const BusinessQRCodeScreen = () => {
         }
     }
 
+    // Handler function to share the QR code upon pressing the Share QR Code button
     const handleShareQRCode = async () => {
-        await shareQRCode(qrCodeRef, userData.business_name);
+        await shareQRCode(qrCodeRef, userData.business_name); // Call the service function to share the QR code, which essentially allows user to share the QR code image to other apps on the device
     }
 
     return (
         <View style={styles.container}>
+            {/* If a QR code is found in the database, display it along with the share and download buttons */}
             {qrCode ? (
                 <View style={styles.qrContainer}>
                     <Text style={styles.businessName}>{userData.business_name}'s Business QR Code</Text>
@@ -95,7 +99,7 @@ const BusinessQRCodeScreen = () => {
                     />
                     <TouchableOpacity
                         style={[styles.button, { backgroundColor: theme.primaryColor }]}
-                        onPress={handleShareQRCode}
+                        onPress={handleShareQRCode} // Handler to share the QR code
                     >
                         <Icon
                             name="share-alt"
@@ -121,6 +125,7 @@ const BusinessQRCodeScreen = () => {
                     </TouchableOpacity>
                 </View>
             ) : (
+                // If fetchQRCodeFromDB() does not find a QR code in the database, prompt the user to generate one
                 <TouchableOpacity
                     style={[styles.button, { backgroundColor: theme.primaryColor }]}
                     onPress={handleGenerateQRCode}

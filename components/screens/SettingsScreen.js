@@ -7,16 +7,19 @@ import { fetchActiveParking } from '../../services/QRCodeService.js';
 
 const SettingsScreen = ({ navigation }) => {
     const { user, userData } = useAuth()
-    const { logout } = useAuthService()
-    const [activeTicket, setActiveTicket] = useState(null);
+    const { logout } = useAuthService() // Import the logout function from the AuthService
+    const [activeTicket, setActiveTicket] = useState(null); // State to store the active parking ticket data
 
+    // Fetch the active parking ticket if the user is a customer on component mount
     useEffect(() => {
         if(userData.usertype === 'customer'){
+            // Fetch the active parking ticket if the user is a customer
+            // This is to conditionally render the View Acive Parking button, which is green if there is an active ticket and disabled if there is not
             const loadActiveParking = async () => {
                 const result = await fetchActiveParking(userData);
     
                 if (result.success) {
-                    setActiveTicket(result.data);
+                    setActiveTicket(result.data); // If there is an active parking ticket, store it in the state
                 } else {
                     if (result.message !== 'No active parking found') {
                         Alert.alert('Error', result.message);
@@ -24,15 +27,16 @@ const SettingsScreen = ({ navigation }) => {
                 }
             };
     
-            loadActiveParking();
+            loadActiveParking(); // Call the function to fetch the active parking ticket
         }
     }, [userData]);
 
+    // Function to handle the logout button press
     const handleLogout = async () => {
         try {
-            const response = await logout();
+            const response = await logout(); // Call the logout function from the AuthService
             if(response.success){
-                console.log('Logged out');
+                console.log('Logged out'); // If response is succesful, log out the user and navigate to the login screen
             } else {
                 console.log('Error logging out');
                 Alert.alert(`Error logging out: ${response.error}`);
@@ -76,6 +80,8 @@ const SettingsScreen = ({ navigation }) => {
                 </View>
 
                 {/* Menu Options Section */}
+                {/* If user type is business display the Business QR Code button and View Active Parkings Button */}
+                {/* If user type is customer display the Active Parking QR Code button and View Ticket History Button */}
                 <View style={styles.menuOptionsContainer}>
                     {userData.usertype === 'business' ? (
                         <View>
@@ -177,7 +183,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     userDetailsContainer: {
-        marginBottom: 40, // Adds spacing between user details and menu options
+        marginBottom: 40,
     },
     header: {
         color: '#FFF',
@@ -208,7 +214,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     menuOptionsContainer: {
-        flex: 1, // This will take up remaining space after user details
+        flex: 1,
         justifyContent: 'center',
     },
     optionButton: {

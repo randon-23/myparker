@@ -16,6 +16,8 @@ const BusinessStack = () => {
         <>
             <StatusBar barStyle="light-content" />
             <Stack.Navigator>
+                {/* BusinessLanding screen is the main screen for the customer */}
+                {/* Logo is displayed instead of a title */}
                 <Stack.Screen 
                     name="BusinessLanding" 
                     component={BusinessLandingScreen}
@@ -43,6 +45,7 @@ const BusinessStack = () => {
                     component={SettingsScreen}
                     options={{ headerShown: true, title: 'Settings', headerStyle: { backgroundColor: '#000' }, headerTintColor: '#fff', headerTitleAlign: 'center'}} 
                 />
+                {/* QR Code Screen which either dispalys Generate QR Code button or Business QR Code with ability to Share or Download */}
                 <Stack.Screen
                     name="BusinessQRCode"
                     component={BusinessQRCodeScreen}

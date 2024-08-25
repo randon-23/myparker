@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 
+// LoadingScreen component - overlay with loading spinner
 const LoadingScreen = () => {
     return (
         <View style={styles.overlay}>
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 10,
         fontSize: 18,
-        color: '#ffffff', // White text color
+        color: '#ffffff',
     },
 });
 

@@ -7,38 +7,45 @@ import { useTheme } from '../../contexts/ThemeContext';
 const { width, height } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }) => {
+  // These are the states for the email and password fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   //This is a user type that will determine the state of the login screen
   const [userType, setUserType] = useState('customer'); //Local usertype mainly for setting of theme
 
-  const { theme, updateTheme } = useTheme();
-  const { login } = useAuthService();
+  const { theme, updateTheme } = useTheme(); // Get the theme and updateTheme function from the ThemeContext
+  const { login } = useAuthService(); // Get the login function from the AuthService
 
+  // Function to handle the login process
   const handleLogin = async () => {
+    // Check if the email and password fields are empty
     if(!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
+    // Create a formData object with the email, password, and userType
     const formData = {
       userType,
       email,
       password
     }
 
+    // Call the login function from the AuthService with the formData object
     try{
+      // Call the login function from the AuthService with the formData object and store the response
       const response = await login(formData.email, formData.password, formData.userType);
 
+      // If the response is successful, log the session data
       if(!response.success){
-        console.log(response)
-        
+
+        // If the error message is related to the user type or email/password, show an alert with the error message
         if(response.error.includes('Account is not of selected type')){
           Alert.alert('Login error', response.error)
-        } else if(response.error.includes('Invalid email or password')) {
+        } else if(response.error.includes('Invalid email or password')) { // If the usertype selected is correct but the credentials are wrong
           Alert.alert('Login error', response.error)
         } else {
-          Alert.alert('Login error', `An error occurred - ${error.message}`)
+          Alert.alert('Login error', `An error occurred - ${error.message}`) // If the error is not related to the user type or email/password
         }
       } else {
         console.log('Login successful')
@@ -144,8 +151,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: width * 0.8, // 80% of screen width
-    height: height * 0.3, // 30% of screen height,
+    width: width * 0.8,
+    height: height * 0.3,
     alignSelf: 'center',
     marginBottom: 40,
   },

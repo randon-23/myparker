@@ -18,6 +18,7 @@ export default function App() {
     requestPermissions(isFirstLaunch);
   }, [isFirstLaunch])
 
+  // Wrapping the app in the ThemeProvider and AuthProvider contexts which are accessed throughout the application
   return (
     <ThemeProvider>
       <AuthProvider>
