@@ -20,3 +20,6 @@ Once dependencies have been installed, run the Androd emulator. Once again, make
 When this is done run the following command
 npm run android --clear
 --clear ensures that hte cache is cleared before running the project
+
+To access application on Expo Snack - remember to switch device to Android on Expo Snack (also since QR Code scanning is core functionality, that is not going to work on Expo Snack, however you can see the result of actions done on Expo Go on a physical device such as generated business and parking QR Codes and the latter's status)
+EXPO SNACK URL: https://snack.expo.dev/@arandon24/github.com-randon-23-myparker
