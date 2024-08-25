@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import MainNavigator from './navigation/MainNavigation';
-import { AuthProvider } from '../myparker/contexts/AuthContext.js';
-import { ThemeProvider } from '../myparker/contexts/ThemeContext.js';
+import { AuthProvider } from './contexts/AuthContext.js';
+import { ThemeProvider } from './contexts/ThemeContext.js';
 import { checkFirstLaunch, requestPermissions } from './services/LaunchService.js'
 
 export default function App() {
