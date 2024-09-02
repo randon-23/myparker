@@ -36,3 +36,4 @@ yarn-error.*
 .gitignore
 # typescript
 *.tsbuildinfo
+*.mp4
